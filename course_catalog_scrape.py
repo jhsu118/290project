@@ -20,14 +20,14 @@ for url in good_urls:
 	html = urllib2.urlopen(str(good_urls[0]))
 	soup=bs4.BeautifulSoup(html, "html5lib")
 	print url
-	soup.find_all('b')[2] #navigate the tree to grab the anchor tags below this b tag
+	#soup.find_all('b')[2] #navigate the tree to grab the anchor tags below this b tag
 	# then store each one in another variable called, e.g., dept_sub_urls = []
 	
-	soup.find_all('b')[2].contents
-	str(soup.find_all('b')[2].contents[0])
+	#soup.find_all('b')[2].contents
+	#str(soup.find_all('b')[2].contents[0])
 
-	next sibling, next element, children....
-	prettify
+	#next sibling, next element, children....
+	#prettify
 
-	grab in bold, to first period.  periods in paren
-	end of course description (look for (F), (SP))
+	#grab in bold, to first period.  periods in paren
+	#end of course description (look for (F), (SP))
