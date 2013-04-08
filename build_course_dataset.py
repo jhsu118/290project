@@ -1,4 +1,5 @@
 import re
+import json
 
 courses = {}
 f = open('coursecatalog.txt', 'r').read().replace('\n \n','__break__').replace('\n',' ').replace('__break__','\n__break__')
@@ -22,7 +23,6 @@ for entry in course_blocks[:-2]:
     counter += 1
 
 
-for key, value in courses.iteritems() :
-    print key, value
-
+myfile = open('courses_data_set.json','w')
+myfile.write(json.dumps(courses))
 
