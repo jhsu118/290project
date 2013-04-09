@@ -34,6 +34,7 @@ for entry in course_blocks:
         courses[class_id]['title'] = title
         courses[class_id]['dept_name_full'] = dept_name_full
         courses[class_id]['dept_code'] = dept_code
+        courses[class_id]['course_num'] = course_num
         courses[class_id]['desc'] = course_desc    
 '''       
 for key, value in courses.iteritems():
