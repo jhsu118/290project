@@ -1,0 +1,8 @@
+course_urls=[]
+course_links=soup.find_all("a")#[2]
+	#course_links=soup.find_all("b", text="Related Course  Descriptions")
+	#course_links=soup.find_all("b",href="http://general-catalog.berkeley.edu/catalog/gcc_list_crse_req?p_dept_name")
+for sub_url in course_links:
+	try:
+		if sub_url.attrs["href"][:73]=="http://general-catalog.berkeley.edu/catalog/gcc_list_crse_req?p_dept_name":  #filter out non-course catalog links
+			course_urls.append(url.attrs["href"])
