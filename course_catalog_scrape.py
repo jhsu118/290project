@@ -66,4 +66,7 @@ print "Regular expression will not much this number of courses: %s" % len(badCou
 print "This number courses have some sort of bs4 string error: %s" % len(noStringCourses) #7
 print "Total courses scraped, including un-dictionary-able ones: %s" % totalCoursesScraped  #8360
 
+import json
+with open('courses.json', 'wb') as fp:
+    json.dump(courses, fp)
 
