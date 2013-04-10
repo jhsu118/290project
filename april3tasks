@@ -4,6 +4,8 @@ Histogram: number of courses in departments, mean/m/m
 Stats: # cross listed courses
 Histogram and table: Number of unique words/department
 
-vanessa: add code, add file with data (will be dictionary) -- done 4/8
+vanessa:  4/8: add code, add file with data (will be dictionary)
+          4/9: updated my script to fix a bug. Pushed code for cleaned data set (removed dupes, courses without a title or description removed)
+
 
 
