@@ -1,11 +1,25 @@
-##Builds a training set
+##Builds a data and test set
 import json
 import random
 import math
-
+import string
 
 with open('courses_data_set.json', 'rb') as fp:
     data = json.load(fp)
+
+#adds a 'unique word' key that holds array of each class' unique words
+globaluniquewords=[]
+for key in data:
+	description = str(data[key]['desc'])
+	out=description.translate(string.maketrans("",""), string.punctuation)
+	out=out.lower()
+	array_of_words = out.split(' ')
+	array_of_words=list(set(array_of_words))
+	array_of_words.sort()
+	data[key]['unique_words']=array_of_words
+	globaluniquewords.extend(data[key]['unique_words'])	
+globaluniquewords=list(set(globaluniquewords)) 
+globaluniquewords.sort()   #global data set unique words
 
 #new dictionary in the {dept: classes}, format
 bydept={}
@@ -33,9 +47,11 @@ for course in data:
     else:
         print "did not add course"
 
-with open('trainingset.json', 'wb') as fp:
-    json.dump(training, fp)
+with open('dataset_with_word_arrays.json', 'wb') as fp:
+    json.dump(data, fp)
 with open('testingset.json', 'wb') as fp:
     json.dump(testing, fp)
+with open('trainingset.json', 'wb') as fp:
+    json.dump(training, fp)
 
 
