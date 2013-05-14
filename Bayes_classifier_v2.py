@@ -3,12 +3,32 @@ import json
 from collections import *
 import operator
 
+##dropStopwords=FALSE
+
 #import training and testing sets
-with open('trainingset.json', 'rb') as fp:
+'''with open('trainingset.json', 'rb') as fp:
     training = json.load(fp)
 with open('testingset.json', 'rb') as fp:
+    testing = json.load(fp)'''
+with open('trainingset_reduced_over300.json', 'rb') as fp:
+    training = json.load(fp)
+with open('testingset_reduced_over300.json', 'rb') as fp:
     testing = json.load(fp)
 
+
+##STRIP STOP WORDS
+#if dropStopwords==TRUE:
+
+f_stopwords = open('stopwords.txt','r')
+stop_words = []
+for line in f_stopwords:
+    stop_words.append(line.strip())
+stop_words = set(stop_words)
+for course in testing:
+    testing[course]["unique_words"]=[word for word in testing[course]["unique_words"] if word not in stop_words] #list comprehension, puts back in list only if not a stopword
+for course in training:
+    training[course]["unique_words"]=[word for word in training[course]["unique_words"] if word not in stop_words] #list comprehension, puts back in list only if not a stopword        
+    
 ##PREPARE DICTIONARIES AND FUNCTIONS FOR CLASSIFIER TO USE
 
 #Function for classifier to multiply all conditional probabilities
@@ -60,10 +80,11 @@ deptwordcount = {}
 for word in trainingunique:
     deptwordcount[word] = findkeywordcount(word)
 
+##CLASSIFIER BEGINS HERE
 ##return the number of classes in that department a word appears in
 results={}
+deptresults={}
 progresscounter=0
-##CLASSIFIER
 for testcourse in testing:
     print progresscounter
     alldeptprobs={}
@@ -81,14 +102,14 @@ for testcourse in testing:
             #if len(deptwordcount[word].keys()) == 1:
                # count = 1000
             if count == 0:
-                inflation += .0001
+                inflation += .00001
             probsnum.append(count)
         cleanprobs=[]
         for prob in probsnum: #inflate loop
             cleanprobs.append(float(prob+inflation)/(len(bydept_tr[dept])+inflation))
         alldeptprobs[dept]=reduce(mult, cleanprobs) * deptprob[dept]
     temp={} #dictionary to store results
-    result = max(alldeptprobs.iteritems(), key=operator.itemgetter(1))[0]
+    result = max(alldeptprobs.iteritems(), key=operator.itemgetter(1))[0]  ##add second /third 
     temp['result'] = result
     if testing[testcourse]['dept_code'] == result:
         temp['correct'] = True
@@ -96,6 +117,11 @@ for testcourse in testing:
         temp['correct'] = False
     temp['probs'] = alldeptprobs
     results[testcourse] = temp
+    
+    deptresults[progresscounter]={}    
+    deptresults[progresscounter]['result']=temp['correct']
+    deptresults[progresscounter]['dept_code']=testing[testcourse]['dept_code']
+    deptresults[progresscounter]['testcourse']=testing[testcourse]['course_num']
     progresscounter+=1
 
 ##Evaluate how well our classifier did
@@ -107,95 +133,36 @@ for key in results:
 for key in results:
     print key, results[key]['result']
 
-resultsordered=results.sort
+
+resultList=sorted(results.keys())
+resultList2=[]
+resultList3=[]
+for testcourse in resultList:
+    resultList2.append(results[testcourse]['result'])
+    resultList3.append(results[testcourse]['correct'])
+RESULT=zip (resultList, resultList2, resultList3)
 
 
-"""
-numcourses={}
-for key,value in training.iteritems():
-	if value['dept_code'] not in numcourses:
-		numcourses[value['dept_code']] = 1
-		#print (key, value)
-	else:
-		numcourses[value['dept_code']] += 1
-numcourses2={} #sorted version
-for key in sorted(numcourses.iterkeys()):
-	numcourses2[key]=numcourses[key]
-
-# given a word, how many times does it appear in a department    
-from collections import *
-
-def findkeywordcount(word):
-    keywordcount = defaultdict(int)
-    for key in training:
-        if word in training[key]['unique_words']:
-            keywordcount[training[key]['dept_code']] += 1
-    for key in training:
-        if training[key]['dept_code'] not in keywordcount:
-            keywordcount[training[key]['dept_code']] = 0
-    return dict(keywordcount)
-
-giantwordcount = {}
-for word in trainignuniquewords:
-    giantwordcount[word] = findkeywordcount(word)
-
-giantwordcount["workstations"]['RHETOR']/100
-
-##NAIVE BAYESIAN CLASSIFIER
-
-count = 0
-specialwords = []
-for course in testing:
-    for word in testing[course]['unique_words']:
-        if word not in giantwordcount:
-            count += 1
-            specialwords += [word]
-bayes={} #dictionary of probabilities
-for word in giantwordcount:
-    temp = {}
-    for dept in giantwordcount[word]:
-        temp[dept] = float(giantwordcount[word][dept]) / (numcourses2[dept])
-        #temp[dept] = float(giantwordcount[word][dept]+count) / (numcourses2[dept]+count) 
-    bayes[word] = temp
-#for word in specialwords:
-#    temp = {}
-#    for dept in numcourses2:
-#        temp[dept] = 1.0 / (numcourses2[dept]+count)
-#    bayes[word] = temp
-   
-
-deptprob = {}  #probability that a course belongs to a department just based on department sizes
-for dept in numcourses2:
-    deptprob[dept] = float(numcourses2[dept]) / len(training)
-
-
-import operator
-results = {}
-for course in testing:
-    probs = {}
-    for dept in numcourses2:
-        probs[dept] = deptprob[dept]
-        #probs[dept] = math.log(deptprob[dept])
-    for word in testing[course]['unique_words']:
-        if word not in bayes: #this is to get rid of hebrewaramaric word
-            continue       
-        for dept in bayes[word]:
-            probs[dept] *= bayes[word][dept]
-            #probs[dept] += math.log(bayes[word][dept])
-    temp = {}
-    result = max(probs.iteritems(), key=operator.itemgetter(1))[0]
-    temp['result'] = result
-    if testing[course]['dept_code'] == result:
-        temp['correct'] = True
+Table2={}
+for entry in deptresults.iteritems():
+    if entry[1]['dept_code'] not in Table2:
+        if entry[1]['result'] == True:
+            Table2[entry[1]['dept_code']]={'Trues': 1, 'Falses': 0}
+        if entry[1]['result'] == False:
+            Table2[entry[1]['dept_code']]={'Trues': 0, 'Falses': 1}
+       
+        #{'falses': 0, 'trues':0}
     else:
-        temp['correct'] = False
-    temp['probs'] = probs
-    results[course] = temp
+        if entry[1]['result']==True:
+            Table2[entry[1]['dept_code']]['Trues']+=1
+        if entry[1]['result']==False:
+            Table2[entry[1]['dept_code']]['Falses']+=1
 
-numcorrect = 0
-for key in results:
-    if results[key]['correct']:
-        numcorrect += 1
+FinalResult = {}
+for entry in Table2:
+    if entry not in numcourses2_tr.keys(): #There are six departments that are in testing set, but not in training set. Skip these.
+        print entry
+        continue
+    FinalResult[entry] = [float(Table2[entry]['Trues'])/(Table2[entry]['Trues']+Table2[entry]['Falses']), Table2[entry]['Trues']+Table2[entry]['Falses'],numcourses2_tr[entry]]
 
-for key in results:
-    print key, results[key]['result'] """
+
