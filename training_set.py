@@ -38,7 +38,6 @@ for dept in bydept:
 testing={}
 for course in testingcourses:
 	testing[course]=data[course]
-	#testing.pop(course)
 
 training = {}##this is our training set!!!!!
 for course in data:
