@@ -1,4 +1,4 @@
-##Builds a data and test set
+##Builds a training and test set
 import json
 import random
 import math
