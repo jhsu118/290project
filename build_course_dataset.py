@@ -1,5 +1,8 @@
 import re
 import json
+import string
+
+'''Reads in text from the scraped_course_catalog.txt and builds json data set with: class_id, department name, department code, couse number, and course description.'''
 
 courses = {}
 f = open('coursecatalog.txt', 'r').read().replace('\n \n','__break__').replace('\n',' ').replace('__break__','\n__break__')
@@ -26,7 +29,7 @@ for entry in course_blocks:
         course_num = re.findall('\).*?\w+', entry)[1].lstrip(') ')
     
     course_desc = re.findall('Description.*\{', entry)[0][13:].rstrip(' {').strip()
-        
+    course_desc_clean = course_desc.translate(string.maketrans("",""), '!"#$%&\'()*+,./:;<=>?@[\\]^_`{|}~')
     class_id = dept_code + ' ' + course_num
         
     if course_desc != '' and title != '' and class_id not in courses:
@@ -35,23 +38,7 @@ for entry in course_blocks:
         courses[class_id]['dept_name_full'] = dept_name_full
         courses[class_id]['dept_code'] = dept_code
         courses[class_id]['course_num'] = course_num
-        courses[class_id]['desc'] = course_desc    
-'''       
-for key, value in courses.iteritems():
-	print key, value
-'''
+        courses[class_id]['desc'] = course_desc_clean
 
 myfile = open('courses_data_set.json','w')
 myfile.write(json.dumps(courses))
-
-
-'''
-Doc Stats:
-10,373 courses originally.
-No title: 443
-No dept name full: 0
-No dept code: 0
-No description: 897
-9466 courses with title, dept, and description.
-5777 unique courses
-'''
