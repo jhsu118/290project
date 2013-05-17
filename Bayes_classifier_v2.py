@@ -9,10 +9,14 @@ import operator
 '''with open('trainingset.json', 'rb') as fp:
     training = json.load(fp)
 with open('testingset.json', 'rb') as fp:
-    testing = json.load(fp)'''
+    testing = json.load(fp)
 with open('trainingset_reduced_over300.json', 'rb') as fp:
     training = json.load(fp)
 with open('testingset_reduced_over300.json', 'rb') as fp:
+    testing = json.load(fp)'''
+with open('trainingset_small.json', 'rb') as fp:
+    training = json.load(fp)
+with open('testingset_small.json', 'rb') as fp:
     testing = json.load(fp)
 
 
